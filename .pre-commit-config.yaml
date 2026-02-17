@@ -4,8 +4,8 @@ repos:
   - repo: local
     hooks:
       - id: build-and-stage-dist
-        name: Build and Stage dist/index.js
-        entry: bash -c "npm run build && git add dist/index.js"
+        name: Build
+        entry: bash -c "npm run build"
         language: system
         files: ^src/.*\.ts$
         pass_filenames: false
