@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getInput, setFailed } from "@actions/core";
+import { getInput, setFailed, setOutput } from "@actions/core";
 import { context } from "@actions/github";
 
 const LINEAR_API_URL = "https://api.linear.app/graphql";
@@ -64,6 +64,7 @@ export async function createIssue({ issue }: { issue: any }) {
 
     if (issueId) {
       await attachGitHubURLToIssue(url, issueId, linearAPIToken);
+      setOutput("issue-id", issueId);
     }
   } else {
     setFailed({
