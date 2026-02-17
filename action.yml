@@ -1,5 +1,5 @@
 name: "Create Linear Issue"
-description: "Automatically import a created GitHub issue into Linear."
+description: "Creates a Linear issue with a specified title and description."
 inputs:
   linear-api-token:
     description: "The API key to your Linear team"
@@ -9,6 +9,12 @@ inputs:
     required: true
   state-name:
     description: "The name of the state to be applied (e.g., 'Todo', 'In Progress')"
+    required: true
+  issue-title:
+    description: "The title for the new Linear issue"
+    required: true
+  issue-description:
+    description: "The description for the new Linear issue"
     required: true
 
 runs:
