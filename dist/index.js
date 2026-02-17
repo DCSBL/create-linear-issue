@@ -112494,23 +112494,20 @@ async function createIssue() {
     const linear = new sdk_1.LinearClient({
         apiKey: linearAPIToken,
     });
-    const team = await linear.teamSearch({
-        query: teamName,
-    });
-    if (!team || team.nodes.length === 0) {
+    const teams = await linear.teams();
+    const team = teams.nodes.find((t) => t.name === teamName);
+    if (!team) {
         throw new Error(`Could not find team with name: ${teamName}`);
     }
-    const teamId = team.nodes[0].id;
-    const state = await linear.workflowStates({
-        filter: {
-            name: { eq: stateName },
-            team: { id: { eq: teamId } },
-        },
+    const teamId = team.id;
+    const workflowStates = await linear.workflowStates({
+        filter: { team: { id: { eq: teamId } } },
     });
-    if (!state || state.nodes.length === 0) {
+    const state = workflowStates.nodes.find((s) => s.name === stateName);
+    if (!state) {
         throw new Error(`Could not find state with name: ${stateName} in team: ${teamName}`);
     }
-    const stateId = state.nodes[0].id;
+    const stateId = state.id;
     try {
         const { success, issue: linearIssue } = await linear.issueCreate({
             title: issueTitle,
