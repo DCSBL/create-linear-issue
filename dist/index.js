@@ -112509,7 +112509,7 @@ async function createIssue() {
     }
     const stateId = state.id;
     try {
-        const { success, issue: linearIssue } = await linear.issueCreate({
+        const { success, issue: linearIssue } = await linear.createIssue({
             title: issueTitle,
             description: issueDescription,
             teamId,
