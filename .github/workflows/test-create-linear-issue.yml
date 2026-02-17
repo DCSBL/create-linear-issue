@@ -1,16 +1,7 @@
 name: Test Create Linear Issue Action
 
 on:
-  workflow_dispatch:
-    inputs:
-      team_name:
-        description: 'Linear Team Name'
-        required: true
-        default: 'Your Team Name' # Replace with a default team name in your Linear workspace
-      state_name:
-        description: 'Linear State Name'
-        required: true
-        default: 'Todo' # Replace with a default state name in your Linear workspace
+  pull_request:
 
 jobs:
   test-action:
@@ -24,8 +15,8 @@ jobs:
         uses: ./ # Uses the action in the current repository
         with:
           linear-api-token: ${{ secrets.LINEAR_TOKEN }}
-          team-name: ${{ github.event.inputs.team_name }}
-          state-name: ${{ github.event.inputs.state_name }}
+          team-name: ${{ vars.TEAM }}
+          state-name: ${{ vars.STATE }}
           issue-title: "Test Issue from GitHub Action"
           issue-description: "This is a test issue created by a GitHub Action workflow to verify the create-linear-issue action."
 
