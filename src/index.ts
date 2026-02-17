@@ -11,6 +11,7 @@ export async function createIssue() {
   const stateName = getInput("state-name", { required: true });
   const issueTitle = getInput("issue-title", { required: true });
   const issueDescription = getInput("issue-description", { required: true });
+  const fullIssueDescription = `${issueDescription}\n_This issue has been created via the [Create linear issue](https://github.com/DCSBL/create-linear-issue) workflow_`;
 
   const linear = new LinearClient({
     apiKey: linearAPIToken,
@@ -41,7 +42,7 @@ export async function createIssue() {
   try {
     const { success, issue: linearIssue } = await linear.createIssue({
       title: issueTitle,
-      description: issueDescription,
+      description: fullIssueDescription,
       teamId,
       stateId,
     });
