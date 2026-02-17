@@ -14840,6 +14840,7 @@ async function createIssue({ issue }) {
         const issueId = (_e = (_d = (_c = data.data) === null || _c === void 0 ? void 0 : _c.issueCreate) === null || _d === void 0 ? void 0 : _d.issue) === null || _e === void 0 ? void 0 : _e.id;
         if (issueId) {
             await attachGitHubURLToIssue(url, issueId, linearAPIToken);
+            (0, core_1.setOutput)("issue-id", issueId);
         }
     }
     else {
