@@ -25,10 +25,10 @@ jobs:
 
       - name: Delete Linear Issue via GraphQL
         run: |
-          curl -X POST 
-          -H "Content-Type: application/json" 
-          -H "Authorization: Bearer ${{ secrets.LINEAR_TOKEN }}" 
-          -d '{ "query": "mutation { issueDelete(id: "'${{ env.LINEAR_ISSUE_ID }}'") { success } }" }' 
+          curl -X POST \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ secrets.LINEAR_TOKEN }}" \
+          -d '{ "query": "mutation { issueDelete(id: "'${{ env.LINEAR_ISSUE_ID }}'") { success } }" }' \
           https://api.linear.app/graphql
         env:
           LINEAR_ISSUE_ID: ${{ env.LINEAR_ISSUE_ID }} # Pass as environment variable for curl
