@@ -49,7 +49,7 @@ export async function createIssue() {
     if (success && linearIssue) {
       console.log("Successfully created the issue!");
 
-      const issueId = linearIssue.id;
+      const issueId = (await linearIssue).identifier.toString();
 
       setOutput("issue-id", issueId);
     } else {
