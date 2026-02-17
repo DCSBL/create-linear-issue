@@ -1,20 +1,16 @@
 import { getInput, setFailed, setOutput } from "@actions/core";
-import { context } from "@actions/github";
 import { LinearClient } from "@linear/sdk";
 
 async function main() {
-  const { issue } = context.payload;
-  if (!issue) {
-    throw new Error("Could not find current issue");
-  }
-
-  await createIssue({ issue });
+  await createIssue();
 }
 
-export async function createIssue({ issue }: { issue: any }) {
+export async function createIssue() {
   const linearAPIToken = getInput("linear-api-token", { required: true });
   const teamName = getInput("team-name", { required: true });
   const stateName = getInput("state-name", { required: true });
+  const issueTitle = getInput("issue-title", { required: true });
+  const issueDescription = getInput("issue-description", { required: true });
 
   const linear = new LinearClient({
     apiKey: linearAPIToken,
@@ -45,14 +41,10 @@ export async function createIssue({ issue }: { issue: any }) {
 
   const stateId = state.nodes[0].id;
 
-  console.debug("issue data: ", {
-    issue,
-  });
-
   try {
     const { success, issue: linearIssue } = await linear.issueCreate({
-      title: issue.title,
-      description: issue.body,
+      title: issueTitle,
+      description: issueDescription,
       teamId,
       stateId,
     });
@@ -60,13 +52,7 @@ export async function createIssue({ issue }: { issue: any }) {
     if (success && linearIssue) {
       console.log("Successfully created the issue!");
 
-      const url = issue.html_url;
       const issueId = linearIssue.id;
-
-      await linearIssue.createLink({
-        url,
-        title: "Original GitHub Issue",
-      });
 
       setOutput("issue-id", issueId);
     } else {
