@@ -12,7 +12,8 @@
   "dependencies": {
     "@actions/core": "^1.8.2",
     "@actions/github": "^5.0.3",
-    "axios": "^1.13.5"
+    "axios": "^1.13.5",
+    "@linear/sdk": "^75.0.0"
   },
   "devDependencies": {
     "@casper124578/eslint-config": "^4.4.0",

@@ -1,8 +1,6 @@
-import axios from "axios";
 import { getInput, setFailed, setOutput } from "@actions/core";
 import { context } from "@actions/github";
-
-const LINEAR_API_URL = "https://api.linear.app/graphql";
+import { LinearClient } from "@linear/sdk";
 
 async function main() {
   const { issue } = context.payload;
@@ -18,58 +16,41 @@ export async function createIssue({ issue }: { issue: any }) {
   const teamId = getInput("team-id", { required: true });
   const stateId = getInput("state-id", { required: true });
 
+  const linear = new LinearClient({
+    apiKey: linearAPIToken,
+  });
+
   console.debug("issue data: ", {
     issue,
   });
 
-  const body = JSON.stringify({
-    query: `mutation IssueCreate($title: String!, $description: String!, $teamId: String!, $stateId: String!) {
-      issueCreate(
-          input: {
-              title: $title
-              description: $description
-              teamId: $teamId
-              stateId: $stateId
-          }
-      ) {
-          success
-          issue {
-            id
-          }
-      }
-  }`,
-    variables: {
+  try {
+    const { success, issue: linearIssue } = await linear.issueCreate({
       title: issue.title,
       description: issue.body,
       teamId,
       stateId,
-    },
-  });
+    });
 
-  const { data } = await axios({
-    url: LINEAR_API_URL,
-    method: "POST",
-    data: body,
-    headers: {
-      Authorization: linearAPIToken,
-      "Content-Type": "application/json",
-    },
-  });
+    if (success && linearIssue) {
+      console.log("Successfully created the issue!");
 
-  if (data.data?.issueCreate?.success) {
-    console.log("Successfully created the issue!");
+      const url = issue.html_url;
+      const issueId = linearIssue.id;
 
-    const url = issue.html_url;
-    const issueId = data.data?.issueCreate?.issue?.id;
+      await linearIssue.createLink({
+        url,
+        title: "Original GitHub Issue",
+      });
 
-    if (issueId) {
-      await attachGitHubURLToIssue(url, issueId, linearAPIToken);
       setOutput("issue-id", issueId);
+    } else {
+      setFailed("Unable to create Linear issue. An unexpected error occurred.");
     }
-  } else {
+  } catch (error: any) {
     setFailed({
-      message: "Unable to create Linear issue. An unexpected error occurred",
-      stack: data.data,
+      message: `Unable to create Linear issue: ${error.message}`,
+      stack: error.stack,
       name: "CreateLinearIssueError",
     });
   }
@@ -85,33 +66,4 @@ try {
   }
 
   setFailed("Could not create the Linear issue. Unknown error");
-}
-
-async function attachGitHubURLToIssue(url: string, issueId: string, apiToken: string) {
-  const body = JSON.stringify({
-    query: `mutation LinkToIssue($url: String!, $issueId: String!, $title: String!) {
-      attachmentLinkURL(url: $url, issueId: $issueId, title: $title) {
-        attachment {
-          id
-        }
-      }
-  }`,
-    variables: {
-      url,
-      issueId,
-      title: "Original GitHub Issue",
-    },
-  });
-
-  const { data } = await axios({
-    url: LINEAR_API_URL,
-    method: "POST",
-    data: body,
-    headers: {
-      Authorization: apiToken,
-      "Content-Type": "application/json",
-    },
-  });
-
-  return data;
 }
