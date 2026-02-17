@@ -13,12 +13,37 @@ async function main() {
 
 export async function createIssue({ issue }: { issue: any }) {
   const linearAPIToken = getInput("linear-api-token", { required: true });
-  const teamId = getInput("team-id", { required: true });
-  const stateId = getInput("state-id", { required: true });
+  const teamName = getInput("team-name", { required: true });
+  const stateName = getInput("state-name", { required: true });
 
   const linear = new LinearClient({
     apiKey: linearAPIToken,
   });
+
+  const team = await linear.teamSearch({
+    query: teamName,
+  });
+
+  if (!team || team.nodes.length === 0) {
+    throw new Error(`Could not find team with name: ${teamName}`);
+  }
+
+  const teamId = team.nodes[0].id;
+
+  const state = await linear.workflowStates({
+    filter: {
+      name: { eq: stateName },
+      team: { id: { eq: teamId } },
+    },
+  });
+
+  if (!state || state.nodes.length === 0) {
+    throw new Error(
+      `Could not find state with name: ${stateName} in team: ${teamName}`
+    );
+  }
+
+  const stateId = state.nodes[0].id;
 
   console.debug("issue data: ", {
     issue,

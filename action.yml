@@ -4,11 +4,11 @@ inputs:
   linear-api-token:
     description: "The API key to your Linear team"
     required: true
-  team-id:
-    description: "The id to your Linear team"
+  team-name:
+    description: "The name of your Linear team"
     required: true
-  state-id:
-    description: "The id of what state must be applied (state: 'Todo', 'In Progress', etc)"
+  state-name:
+    description: "The name of the state to be applied (e.g., 'Todo', 'In Progress')"
     required: true
 
 runs:
