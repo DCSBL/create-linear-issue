@@ -1,0 +1,33 @@
+name: Verify dist/index.js is up-to-date
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Verify dist/index.js is up-to-date
+        run: |
+          git diff --exit-code dist/index.js
+        # If the above command fails, it means dist/index.js is not up-to-date
+        # and the workflow will fail.
