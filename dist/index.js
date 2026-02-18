@@ -113954,6 +113954,7 @@ async function createIssue() {
     const stateName = (0, core_1.getInput)("state-name", { required: true });
     const issueTitle = (0, core_1.getInput)("issue-title", { required: true });
     const issueDescription = (0, core_1.getInput)("issue-description", { required: true });
+    const issueLabelsInput = (0, core_1.getInput)("issue-labels", { required: false });
     const fullIssueDescription = `${issueDescription}\n\n_This issue has been created via the [Create linear issue](https://github.com/DCSBL/create-linear-issue) workflow_`;
     const linear = new sdk_1.LinearClient({
         apiKey: linearAPIToken,
@@ -113972,12 +113973,29 @@ async function createIssue() {
         throw new Error(`Could not find state with name: ${stateName} in team: ${teamName}`);
     }
     const stateId = state.id;
+    let labelIds = [];
+    if (issueLabelsInput) {
+        const desiredLabels = issueLabelsInput.split(",").map((label) => label.trim());
+        const availableLabels = await linear.issueLabels({
+            filter: { team: { id: { eq: teamId } } },
+        });
+        for (const desiredLabel of desiredLabels) {
+            const matchedLabel = availableLabels.nodes.find((label) => label.name.toLowerCase() === desiredLabel.toLowerCase());
+            if (matchedLabel) {
+                labelIds.push(matchedLabel.id);
+            }
+            else {
+                console.warn(`Label '${desiredLabel}' not found in team '${teamName}'. Ignoring.`);
+            }
+        }
+    }
     try {
         const { success, issue: linearIssue } = await linear.createIssue({
             title: issueTitle,
             description: fullIssueDescription,
             teamId,
             stateId,
+            labelIds: labelIds.length > 0 ? labelIds : undefined,
         });
         if (success && linearIssue) {
             console.log("Successfully created the issue!");

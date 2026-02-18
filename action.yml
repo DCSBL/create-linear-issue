@@ -16,6 +16,9 @@ inputs:
   issue-description:
     description: "The description for the new Linear issue"
     required: true
+  issue-labels:
+    description: "Comma-separated list of labels to apply to the issue. Labels must already exist in Linear."
+    required: false
 
 runs:
   using: "node20"
