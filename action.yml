@@ -2,7 +2,7 @@ name: "Create Linear Issue"
 description: "Creates a Linear issue with a specified title and description."
 inputs:
   linear-api-token:
-    description: "The API key to your Linear team"
+    description: "The API key to your Linear workspace, Needs `read` and `create-issue` permissions"
     required: true
   team-name:
     description: "The name of your Linear team"
@@ -17,7 +17,7 @@ inputs:
     description: "The description for the new Linear issue"
     required: true
   issue-labels:
-    description: "Comma-separated list of labels to apply to the issue. Labels must already exist in Linear."
+    description: "Comma-separated list of labels to apply to the issue, case insensitive. Labels must already exist in Linear."
     required: false
 
 runs:
